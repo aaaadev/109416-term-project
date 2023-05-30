@@ -82,7 +82,7 @@ enum ConsoleResult refresh_window(struct ConsoleCtx *ctx) {
 
 enum ConsoleResult console_shutdown(struct ConsoleCtx * restrict ctx) {
     disable_raw_mode(ctx);
-    mtx_destroy(ctx->window_mutex)
+    mtx_destroy(&ctx->window_mutex);
     free(ctx);
     return CRESULT_SUCCESS;
 }

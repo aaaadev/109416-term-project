@@ -6,6 +6,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <threads.h>
+#include <sys/ioctl.h>
 
 enum ConsoleResult {
     CRESULT_UNKNWON = 0xFF,
