@@ -29,10 +29,10 @@ static void qr(uint32_t *a, uint32_t *b, uint32_t *c, uint32_t *d) {
 
 // PUBLIC fields
 
-extern void chacha20_init(ChaCha20Ctx *ctx, const uint8_t *key, const uint8_t *nonce);
-extern void chacha20_block(ChaCha20Ctx *ctx, uint8_t *output);
-extern void chacha20_xor(ChaCha20Ctx *ctx, const uint8_t *input, uint8_t *output, size_t size);
-extern uint8_t chacha20_random(size_t size, const uint8_t *key, const uint8_t *nonce);
+extern void chacha20_init(struct ChaCha20Ctx *ctx, const uint8_t *key, const uint8_t *nonce);
+extern void chacha20_block(struct ChaCha20Ctx *ctx, uint8_t *output);
+extern void chacha20_xor(struct ChaCha20Ctx *ctx, const uint8_t *input, uint8_t *output, size_t size);
+extern uint8_t *chacha20_random(size_t size, const uint8_t *key, const uint8_t *nonce);
 extern uint64_t chacha20_random64();
 
 #endif

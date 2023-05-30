@@ -12,11 +12,13 @@ enable_testing()
 add_executable(lotto-645-simulator main.c)
 target_sources(lotto-645-simulator PRIVATE console/console.c)
 target_sources(lotto-645-simulator PRIVATE console/menu.c)
+target_sources(lotto-645-simulator PRIVATE console/input.c)
 target_sources(lotto-645-simulator PRIVATE chacha20/chacha20.c)
 
 add_executable(simple_console tests/simple_console.c)
 target_sources(simple_console PRIVATE console/console.c)
 target_sources(simple_console PRIVATE console/menu.c)
+target_sources(lotto-645-simulator PRIVATE console/input.c)
 target_sources(simple_console PRIVATE chacha20/chacha20.c)
 
 add_test(NAME simple_console COMMAND simple_console)

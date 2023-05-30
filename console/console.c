@@ -14,6 +14,7 @@ struct ConsoleCtx* console_init(void) {
     struct ConsoleCtx *ctx = malloc(sizeof(struct ConsoleCtx));
     pthread_mutex_init(&ctx->window_mutex, NULL);
     enable_raw_mode(ctx);
+    pthread_mutex_lock(&ctx->window_mutex);
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &ctx->window.window_size);
     #ifdef DEBUG
     DPRINTF("row: %d col: %d\n", ctx->window.window_size.ws_row, ctx->window.window_size.ws_col);
@@ -23,6 +24,7 @@ struct ConsoleCtx* console_init(void) {
     for (int i = 0; i < ctx->window.window_size.ws_row; i++) {
         ctx->window.data[i] = (char *)malloc(sizeof(char) * (ctx->window.window_size.ws_col+1));
     }
+    pthread_mutex_unlock(&ctx->window_mutex);
     basic_draw(ctx);
     refresh_window(ctx);
     // MUST BE FREED LATER
@@ -48,6 +50,7 @@ enum ConsoleResult sync_cursor(struct ConsoleCtx *ctx) {
 }
 
 enum ConsoleResult basic_draw(struct ConsoleCtx *ctx) {
+    pthread_mutex_lock(&ctx->window_mutex);
     for (int i = 0; i < ctx->window.window_size.ws_col; i++) {
         ctx->window.data[0][i] = '#';
     }
@@ -61,6 +64,7 @@ enum ConsoleResult basic_draw(struct ConsoleCtx *ctx) {
     for (int i = 0; i < ctx->window.window_size.ws_col; i++) {
         ctx->window.data[ctx->window.window_size.ws_row - 1][i] = '#';
     }
+    pthread_mutex_unlock(&ctx->window_mutex);
     return CRESULT_SUCCESS;
 }
 
@@ -68,6 +72,7 @@ enum ConsoleResult refresh_window(struct ConsoleCtx *ctx) {
     enum ConsoleResult result = CRESULT_SUCCESS;
     update_result(&result, set_cursor(ctx, (struct Cursor) { 0, 0 }));
     raw_clear_console();
+    pthread_mutex_lock(&ctx->window_mutex);
     for (int i = 0; i < ctx->window.window_size.ws_row; i++) {
         for (int j = 0; j < ctx->window.window_size.ws_col; j++) {
             printf("%c", ctx->window.data[i][j]);
@@ -75,6 +80,7 @@ enum ConsoleResult refresh_window(struct ConsoleCtx *ctx) {
         if (i != ctx->window.window_size.ws_row-1)
             printf("\n");
     }
+    pthread_mutex_unlock(&ctx->window_mutex);
     fflush(stdout);
     update_result(&result, set_cursor(ctx, (struct Cursor) { 0, 0 }));
     return result;
@@ -96,13 +102,16 @@ enum ConsoleResult set_cursor(struct ConsoleCtx *ctx, struct Cursor cur) {
 enum ConsoleResult basic_text(struct ConsoleCtx *ctx, struct Cursor cur, char * restrict text) {
     set_cursor(ctx, cur);
     int end_y = cur.y + strlen(text);
+    pthread_mutex_lock(&ctx->window_mutex);
     if (end_y > ctx->window.window_size.ws_col-1) {
+        pthread_mutex_unlock(&ctx->window_mutex);
         return CRESULT_TOOLONGTEXT;
     } else {
         for (int i = cur.y; i < end_y; i++) {
             ctx->window.data[cur.x][i] = text[i-cur.y];
             printf("%c", ctx->window.data[cur.x][i]);
         }
+        pthread_mutex_unlock(&ctx->window_mutex);
         fflush(stdout);
         sync_cursor(ctx);
         return CRESULT_SUCCESS;
@@ -112,7 +121,9 @@ enum ConsoleResult basic_text(struct ConsoleCtx *ctx, struct Cursor cur, char * 
 enum ConsoleResult simple_textvh(struct ConsoleCtx *ctx, char * restrict text, enum TextAlignHorizontal align_h, enum TextAlignVertical align_v) {
     enum ConsoleResult result = CRESULT_SUCCESS;
     int len = strlen(text);
+    pthread_mutex_lock(&ctx->window_mutex);
     int col = ctx->window.window_size.ws_col;
+    pthread_mutex_unlock(&ctx->window_mutex);
     int lines = (len-1)/(col-2) + 1;
     int last_idx = 0;
     switch(align_v) {
@@ -168,16 +179,22 @@ enum ConsoleResult simple_texth(struct ConsoleCtx *ctx, char * restrict text, in
             update_result(&result, basic_text(ctx, (struct Cursor) { row, 1 }, text));
             break;
         case HORIZONTAL_CENTER:
+            pthread_mutex_lock(&ctx->window_mutex);
             if (len > ctx->window.window_size.ws_col-2) {
+                pthread_mutex_unlock(&ctx->window_mutex);
                 update_result(&result, CRESULT_TOOLONGTEXT);
             } else {
+                pthread_mutex_unlock(&ctx->window_mutex);
                 update_result(&result, basic_text(ctx, (struct Cursor) { row, (ctx->window.window_size.ws_col-len)/2 }, text));
             }
             break;
         case HORIZONTAL_RIGHT:
+            pthread_mutex_lock(&ctx->window_mutex);
             if (len > ctx->window.window_size.ws_col-2) {
+                pthread_mutex_unlock(&ctx->window_mutex);
                 update_result(&result, CRESULT_TOOLONGTEXT);
             } else {
+                pthread_mutex_unlock(&ctx->window_mutex);
                 update_result(&result, basic_text(ctx, (struct Cursor) { row, ctx->window.window_size.ws_col-1-len }, text));
             }
             break;
@@ -188,11 +205,16 @@ enum ConsoleResult simple_texth(struct ConsoleCtx *ctx, char * restrict text, in
 }
 
 enum ConsoleResult clear_line(struct ConsoleCtx *ctx, int row) {
+    pthread_mutex_lock(&ctx->window_mutex);
     int col = ctx->window.window_size.ws_col;
+    pthread_mutex_unlock(&ctx->window_mutex);
     set_cursor(ctx, (struct Cursor) { row, 1 });
+    pthread_mutex_lock(&ctx->window_mutex);
     for (int i = 1; i < col-1; i++) {
+        ctx->window.data[row][i] = ' ';
         printf(" ");
     }
+    pthread_mutex_unlock(&ctx->window_mutex);
     sync_cursor(ctx);
     fflush(stdout);
     return CRESULT_SUCCESS;
@@ -200,7 +222,10 @@ enum ConsoleResult clear_line(struct ConsoleCtx *ctx, int row) {
 
 enum ConsoleResult clear_all(struct ConsoleCtx *ctx) {
     enum ConsoleResult result = CRESULT_SUCCESS;
-    for (int i = 1; i < ctx->window.window_size.ws_row-1; i++) {
+    pthread_mutex_lock(&ctx->window_mutex);
+    int row = ctx->window.window_size.ws_row-1;
+    pthread_mutex_unlock(&ctx->window_mutex);
+    for (int i = 1; i < row; i++) {
         update_result(&result, clear_line(ctx, i));
     }
     return result;
