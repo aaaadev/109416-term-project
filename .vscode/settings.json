@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "debug.h": "c",
+        "menu.h": "c",
+        "unistd.h": "c",
+        "console.h": "c"
+    }
+}
