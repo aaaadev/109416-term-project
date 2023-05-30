@@ -5,7 +5,7 @@
 
 #include <termios.h>
 #include <unistd.h>
-#include <threads.h>
+#include <pthread.h>
 #include <sys/ioctl.h>
 
 enum ConsoleResult {
@@ -49,7 +49,7 @@ struct Window {
 
 struct ConsoleCtx {
     struct Cursor cursor;
-    mtx_t window_mutex;
+    pthread_mutex_t window_mutex;
     struct Window window;
     struct termios current;
     struct termios original_termios;

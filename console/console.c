@@ -6,13 +6,13 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <string.h>
-#include <threads.h>
+#include <pthread.h>
 #include "console.h"
 #include "../debug.h"
 
 struct ConsoleCtx* console_init(void) {
     struct ConsoleCtx *ctx = malloc(sizeof(struct ConsoleCtx));
-    mtx_init(&ctx->window_mutex, mtx_plain);
+    pthread_mutex_init(&ctx->window_mutex, NULL);
     enable_raw_mode(ctx);
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &ctx->window.window_size);
     #ifdef DEBUG
@@ -82,7 +82,7 @@ enum ConsoleResult refresh_window(struct ConsoleCtx *ctx) {
 
 enum ConsoleResult console_shutdown(struct ConsoleCtx * restrict ctx) {
     disable_raw_mode(ctx);
-    mtx_destroy(&ctx->window_mutex);
+    pthread_mutex_destroy(&ctx->window_mutex);
     free(ctx);
     return CRESULT_SUCCESS;
 }
