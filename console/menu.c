@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <pthread.h>
 #include "console.h"
 #include "menu.h"
+#include "input.h"
 #include "../debug.h"
 
 struct MenuCtx* menu_init(struct ConsoleCtx *ctx, char * restrict name, on_ok_function on_ok) {
@@ -52,13 +54,20 @@ enum ConsoleResult show_menu(struct MenuCtx *ctx) {
     set_cursor(ctx->ctx, (struct Cursor) { 0, 0 });
     
     // Key handle
-    char c = '\0';
-    while (read(STDIN_FILENO, &c, 1) == 1) {
-        if (c == '\033') {
-            read(STDIN_FILENO, &c, 1);
-            if (c == '[') {
-                read(STDIN_FILENO, &c, 1);
-                switch(c) {
+    void **ret = malloc(sizeof(enum ConsoleResult));
+    *ret = (void*)CRESULT_SUCCESS;
+    pthread_t handler = handleInputArrow(ctx->ctx, key_event, ctx);
+    pthread_join(handler, ret);
+    update_result(&result, (enum ConsoleResult)(*ret));
+    
+    return result;
+}
+
+// PRIVATE
+enum ConsoleResult key_event(char * const str, void *args) {
+    char c = str[0];
+    struct MenuCtx *ctx = args;
+    switch(c) {
                     case 'A':
                         // UP
                         if (ctx->current_select != 0) {
@@ -86,18 +95,7 @@ enum ConsoleResult show_menu(struct MenuCtx *ctx) {
                     default:
                         break;
                 }
-            }
-        } else if (c == '\n') {
-            ctx->on_ok((const struct MenuCtx*)ctx);
-            break;
-        } else {
-            #ifdef DEBUG
-            DPRINTF("unknown key detected\n");
-            fflush(stdout);
-            #endif
-        }
-    }
-    return result;
+    return CRESULT_SUCCESS;
 }
 
 enum ConsoleResult update_menu(struct MenuCtx *ctx) {

@@ -27,4 +27,8 @@ extern size_t add_item(struct MenuCtx *ctx, const struct MenuItem item);
 extern enum ConsoleResult show_menu(struct MenuCtx *ctx);
 extern enum ConsoleResult update_menu(struct MenuCtx *ctx);
 
+// PRIVATE fields
+
+enum ConsoleResult key_event(char * const str, void *args);
+
 #endif
