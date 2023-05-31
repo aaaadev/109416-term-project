@@ -5,22 +5,25 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_HAVE_THREADS_LIBRARY 1)
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEBUG")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -c")
 
 include(CTest)
 enable_testing()
 
 add_executable(lotto-645-simulator main.c)
-target_sources(lotto-645-simulator PRIVATE console/console.c)
-target_sources(lotto-645-simulator PRIVATE console/menu.c)
-target_sources(lotto-645-simulator PRIVATE console/input.c)
-target_sources(lotto-645-simulator PRIVATE chacha20/chacha20.c)
+target_sources(lotto-645-simulator PRIVATE 
+    console/console.c
+    console/menu.c
+    console/input.c
+    chacha20/chacha20.c
+)
 
 add_executable(simple_console tests/simple_console.c)
-target_sources(simple_console PRIVATE console/console.c)
-target_sources(simple_console PRIVATE console/menu.c)
-target_sources(lotto-645-simulator PRIVATE console/input.c)
-target_sources(simple_console PRIVATE chacha20/chacha20.c)
+target_sources(simple_console PRIVATE 
+    console/console.c
+    console/menu.c
+    console/input.c
+    chacha20/chacha20.c
+)
 
 add_test(NAME simple_console COMMAND simple_console)
 

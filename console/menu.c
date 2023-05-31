@@ -59,14 +59,27 @@ enum ConsoleResult show_menu(struct MenuCtx *ctx) {
   // Key handle
   void **ret = malloc(sizeof(enum ConsoleResult));
   *ret = (void *)CRESULT_SUCCESS;
-  pthread_t handler = handleInputArrow(ctx->ctx, key_event, ctx);
+  pthread_t handler =
+      handleInputArrow(ctx->ctx, key_event, key_event_another, ctx);
   pthread_join(handler, ret);
   update_result(&result, (enum ConsoleResult)(*ret));
-
   return result;
 }
 
 // PRIVATE
+enum ConsoleResult key_event_another(char *const str, void *args) {
+  char c = str[0];
+  struct MenuCtx *ctx = args;
+  switch (c) {
+  case '\n':
+    // TODO
+    ctx->on_ok(ctx);
+    break;
+  default:
+    break;
+  }
+}
+
 enum ConsoleResult key_event(char *const str, void *args) {
   char c = str[0];
   struct MenuCtx *ctx = args;

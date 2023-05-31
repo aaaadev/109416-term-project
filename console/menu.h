@@ -31,5 +31,6 @@ extern enum ConsoleResult update_menu(struct MenuCtx *ctx);
 // PRIVATE fields
 
 enum ConsoleResult key_event(char *const str, void *args);
+enum ConsoleResult key_event_another(char *const str, void *args);
 
 #endif

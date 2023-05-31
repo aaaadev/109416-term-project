@@ -8,28 +8,28 @@
 #include <string.h>
 
 pthread_t handleInputArrow(struct ConsoleCtx *ctx, handle_key func,
-                           void *inner_args) {
+                           handle_another_key func_another, void *inner_args) {
   pthread_t handler;
   struct InputCtx *args = malloc(sizeof(struct InputCtx));
   args->ctx = ctx;
   args->func = func;
+  args->func_another = func_another;
   args->count = 1;
   args->options = DEFAULT;
   args->args = inner_args;
-  pthread_create(handler, NULL, handleInputArrowInner, (void *)args);
+  pthread_create(&handler, NULL, handleInputArrowInner, (void *)args);
   return handler;
 }
 
-pthread_t handleInputLine(struct ConsoleCtx *ctx, size_t count, handle_key func,
+pthread_t handleInputLine(struct ConsoleCtx *ctx, handle_key func,
                           void *inner_args) {
   pthread_t handler;
   struct InputCtx *args = malloc(sizeof(struct InputCtx));
   args->ctx = ctx;
   args->func = func;
-  args->count = count;
   args->options = DEFAULT;
   args->args = inner_args;
-  pthread_create(handler, NULL, handleInputLineInner, (void *)args);
+  pthread_create(&handler, NULL, handleInputLineInner, (void *)args);
   return handler;
 }
 
@@ -49,10 +49,10 @@ void handleInputArrowInner(void *args) {
         ctx.func(str, ctx.args);
       }
     } else {
-#ifdef DEBUG
-      DPRINTF("unknown key detected\n");
-      fflush(stdout);
-#endif
+      char *str = malloc(sizeof(char) * 2);
+      str[0] = c;
+      str[1] = '\0';
+      ctx.func_another(str, ctx.args);
     }
   }
   enum ConsoleResult res = CRESULT_SUCCESS;
@@ -63,8 +63,9 @@ void handleInputArrowInner(void *args) {
 
 void handleInputLineInner(void *args) {
   struct InputCtx ctx = *((struct InputCtx *)(args));
-  char *input = malloc(sizeof(char) * ctx.count);
-  if (fgets(input, sizeof(input), stdin) != NULL) {
+  char *input = NULL;
+  size_t bufsize = 0;
+  if (getline(input, &bufsize, stdin) != -1) {
     char *newline = strchr(input, '\n');
     if (newline != NULL) {
       *newline = '\0';
