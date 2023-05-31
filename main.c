@@ -25,8 +25,13 @@ int main(void) {
       "this is second menu item",
       false,
   };
+  struct MenuItem third_item = (struct MenuItem){
+      "this is third menu item",
+      false,
+  };
   add_item(menu, (const struct MenuItem)first_item);
   add_item(menu, (const struct MenuItem)second_item);
+  add_item(menu, (const struct MenuItem)third_item);
   show_menu(menu);
   while (1) {
   }
