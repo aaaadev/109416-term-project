@@ -16,7 +16,6 @@ struct PageCtx *page_init(struct ConsoleCtx *ctx) {
   page_ctx->cur_page = 0;
   page_ctx->pages = NULL;
   page_ctx->history = NULL;
-  page_ctx->history_args_size = 0;
   page_ctx->history_args = NULL;
   page_ctx->history_size = 0;
   return page_ctx;
@@ -48,11 +47,10 @@ enum ConsoleResult navigate_page(struct PageCtx *ctx, size_t page_num,
   ctx->history = realloc(ctx->history,
                          sizeof(struct PageHistory) * (ctx->history_size + 2));
   ctx->history[ctx->history_size] = (struct PageHistory){page_num, args_size};
+  ctx->history_args = realloc(ctx->history_args, sizeof(void*)*(ctx->history_size + 2));
+  ctx->history_args[ctx->history_size] = malloc(args_size);
+  memcpy(ctx->history_args[ctx->history_size], args, args_size);
   ctx->history_size++;
-  ctx->history_args =
-      realloc(ctx->history_args, ctx->history_args_size + args_size);
-  memcpy(ctx->history_args + ctx->history_args_size, args, args_size);
-  ctx->history_args_size += args_size;
   enum ConsoleResult result = CRESULT_SUCCESS;
   pthread_mutex_unlock(&ctx->page_mutex);
   update_result(&result, ctx->pages[page_num].page_draw(ctx, args));
@@ -61,27 +59,23 @@ enum ConsoleResult navigate_page(struct PageCtx *ctx, size_t page_num,
 
 enum ConsoleResult popback_page(struct PageCtx *ctx) {
   pthread_mutex_lock(&ctx->page_mutex);
-  if (ctx->page_count == 0) {
+  if (ctx->history_size == 0) {
 #ifdef DEBUG
-    DPRINTF("warning: ctx->page_count == 0\n");
+    DPRINTF("warning: ctx->history_size == 0\n");
     fflush(stdout);
 #endif
     pthread_mutex_unlock(&ctx->page_mutex);
     return CRESULT_PAGENOTAVAILABLE;
   }
   ctx->history_size--;
-  void *args = malloc(ctx->history[ctx->history_size].args_size);
-  ctx->history_args_size -= ctx->history[ctx->history_size].args_size;
-  memcpy(args, ctx->history_args + ctx->history_args_size,
-         ctx->history[ctx->history_size].args_size);
-  ctx->history_args = realloc(ctx->history_args, ctx->history_args_size);
+  free(ctx->history_args[ctx->history_size]);
+  ctx->history_args = realloc(ctx->history_args, ctx->history_size + 2);
+  ctx->history = realloc(ctx->history, ctx->history_size + 2);
+  void *args = ctx->history_args[ctx->history_size-1];
   enum ConsoleResult result = CRESULT_SUCCESS;
   pthread_mutex_unlock(&ctx->page_mutex);
   update_result(&result,
-                ctx->pages[ctx->history[ctx->history_size].page_num].page_draw(
+                ctx->pages[ctx->history[ctx->history_size-1].page_num].page_draw(
                     ctx, args));
-  pthread_mutex_lock(&ctx->page_mutex);
-  ctx->history = realloc(ctx->history, ctx->history_size + 2);
-  pthread_mutex_unlock(&ctx->page_mutex);
   return result;
 }

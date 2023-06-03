@@ -25,10 +25,9 @@ struct PageCtx {
   size_t page_count;
   size_t cur_page;
   struct PageItem *pages;
-  struct PageHistory *history;
   size_t history_size;
-  size_t history_args_size;
-  void *history_args;
+  struct PageHistory *history;
+  void **history_args;
 };
 
 // PUBLIC fields
