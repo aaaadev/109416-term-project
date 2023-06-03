@@ -90,8 +90,6 @@ enum ConsoleResult popback_page(struct PageCtx *ctx) {
   }
   ctx->cur_page = ctx->history[ctx->history_size - 1].page_num;
   enum ConsoleResult result = CRESULT_SUCCESS;
-  printf("%d", ctx->history_size);
-  fflush(stdout);
   pthread_mutex_unlock(&ctx->page_mutex);
   update_result(
       &result,
