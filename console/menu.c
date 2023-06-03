@@ -8,11 +8,67 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct MenuCtx *menu_init(struct ConsoleCtx *ctx, char *restrict name,
-                          on_ok_function on_ok) {
+// PRIVATE
+enum ConsoleResult key_event_another(const char * str, void *args, enum InputControll *cont) {
+  char c = str[0];
+  struct MenuCtx *ctx = args;
+  switch (c) {
+  case '\n':
+    // TODO
+    ctx->on_ok(ctx);
+    *cont = INPUTC_EXIT;
+    break;
+  default:
+    break;
+  }
+  return CRESULT_SUCCESS;
+}
+
+// PRIVATE
+enum ConsoleResult key_event(const char * str, void *args, enum InputControll *cont) {
+  char c = str[0];
+  struct MenuCtx *ctx = args;
+  switch (c) {
+  case 'A':
+    // UP
+    if (ctx->current_select != 0) {
+      ctx->items[ctx->current_select].is_selected = false;
+      ctx->current_select--;
+      ctx->items[ctx->current_select].is_selected = true;
+      update_menu(ctx);
+    }
+    *cont = INPUTC_CONTINUE;
+    break;
+  case 'B':
+    // DOWN
+    if (ctx->current_select != ctx->item_count - 1) {
+      ctx->items[ctx->current_select].is_selected = false;
+      ctx->current_select++;
+      ctx->items[ctx->current_select].is_selected = true;
+      update_menu(ctx);
+    }
+        *cont = INPUTC_CONTINUE;
+    break;
+  case 'C':
+      *cont = INPUTC_CONTINUE;
+    // RIGHT
+    break;
+  case 'D':
+      *cont = INPUTC_CONTINUE;
+    // LEFT
+    break;
+  default:
+    break;
+  }
+  return CRESULT_SUCCESS;
+}
+
+struct MenuCtx *menu_init(struct ConsoleCtx *ctx, struct PageCtx *page_ctx,
+                          char *restrict name, on_ok_function on_ok) {
   struct MenuCtx *menu = malloc(sizeof(struct ConsoleCtx));
   menu->name = name;
   menu->ctx = ctx;
+  menu->page_ctx = page_ctx;
   menu->item_count = 0;
   menu->current_select = 0;
   menu->items = NULL;
@@ -27,7 +83,8 @@ size_t add_item(struct MenuCtx *ctx, const struct MenuItem item) {
   return (++ctx->item_count);
 }
 
-enum ConsoleResult show_menu(struct MenuCtx *ctx) {
+enum ConsoleResult on_view_menu(struct PageCtx *page_ctx, void *args) {
+  struct MenuCtx *ctx = (struct MenuCtx *)args;
   enum ConsoleResult result = CRESULT_SUCCESS;
 #ifdef DEBUG
   if (ctx->item_count == 0)
@@ -60,58 +117,10 @@ enum ConsoleResult show_menu(struct MenuCtx *ctx) {
   void **ret = malloc(sizeof(enum ConsoleResult));
   *ret = (void *)CRESULT_SUCCESS;
   pthread_t handler =
-      handleInputArrow(ctx->ctx, key_event, key_event_another, ctx);
+      handle_input_arrow(ctx->ctx, key_event, key_event_another, ctx);
   pthread_join(handler, ret);
   update_result(&result, (enum ConsoleResult)(*ret));
   return result;
-}
-
-// PRIVATE
-enum ConsoleResult key_event_another(char *const str, void *args) {
-  char c = str[0];
-  struct MenuCtx *ctx = args;
-  switch (c) {
-  case '\n':
-    // TODO
-    ctx->on_ok(ctx);
-    break;
-  default:
-    break;
-  }
-}
-
-enum ConsoleResult key_event(char *const str, void *args) {
-  char c = str[0];
-  struct MenuCtx *ctx = args;
-  switch (c) {
-  case 'A':
-    // UP
-    if (ctx->current_select != 0) {
-      ctx->items[ctx->current_select].is_selected = false;
-      ctx->current_select--;
-      ctx->items[ctx->current_select].is_selected = true;
-      update_menu(ctx);
-    }
-    break;
-  case 'B':
-    // DOWN
-    if (ctx->current_select != ctx->item_count - 1) {
-      ctx->items[ctx->current_select].is_selected = false;
-      ctx->current_select++;
-      ctx->items[ctx->current_select].is_selected = true;
-      update_menu(ctx);
-    }
-    break;
-  case 'C':
-    // RIGHT
-    break;
-  case 'D':
-    // LEFT
-    break;
-  default:
-    break;
-  }
-  return CRESULT_SUCCESS;
 }
 
 enum ConsoleResult update_menu(struct MenuCtx *ctx) {

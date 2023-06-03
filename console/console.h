@@ -15,7 +15,8 @@ enum ConsoleResult {
   CRESULT_FAILURE = 0x01,
 
   CRESULT_TOOLONGTEXT = 0x10,
-  CRESULT_TOOLONGCOUNT = 0x11
+  CRESULT_TOOLONGCOUNT = 0x11,
+  CRESULT_PAGENOTAVAILABLE = 0x12,
 };
 
 static void update_result(enum ConsoleResult *lhs, enum ConsoleResult rhs) {
@@ -70,8 +71,7 @@ extern enum ConsoleResult basic_text(struct ConsoleCtx *ctx, struct Cursor cur,
 
 extern enum ConsoleResult simple_text(struct ConsoleCtx *ctx,
                                       char *restrict text);
-extern enum ConsoleResult simple_textvh(struct ConsoleCtx *ctx,
-                                        char *restrict text,
+extern enum ConsoleResult simple_textvh(struct ConsoleCtx *ctx, char *text,
                                         enum TextAlignHorizontal align_h,
                                         enum TextAlignVertical align_v);
 extern enum ConsoleResult simple_texth(struct ConsoleCtx *ctx,

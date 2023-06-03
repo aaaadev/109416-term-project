@@ -14,7 +14,10 @@ target_sources(lotto-645-simulator PRIVATE
     console/console.c
     console/menu.c
     console/input.c
+    console/page.c
+    console/dialog.c
     chacha20/chacha20.c
+    util/parse_string.c
 )
 
 add_executable(simple_console tests/simple_console.c)
@@ -22,7 +25,10 @@ target_sources(simple_console PRIVATE
     console/console.c
     console/menu.c
     console/input.c
+    console/page.c
+    console/dialog.c
     chacha20/chacha20.c
+    util/parse_string.c
 )
 
 add_test(NAME simple_console COMMAND simple_console)

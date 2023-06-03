@@ -2,6 +2,7 @@
 
 #include "console.h"
 #include "../debug.h"
+#include "../util/parse_string.h"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -122,7 +123,7 @@ enum ConsoleResult basic_text(struct ConsoleCtx *ctx, struct Cursor cur,
   }
 }
 
-enum ConsoleResult simple_textvh(struct ConsoleCtx *ctx, char *restrict text,
+enum ConsoleResult simple_textvh(struct ConsoleCtx *ctx, char *text,
                                  enum TextAlignHorizontal align_h,
                                  enum TextAlignVertical align_v) {
   enum ConsoleResult result = CRESULT_SUCCESS;
@@ -130,42 +131,26 @@ enum ConsoleResult simple_textvh(struct ConsoleCtx *ctx, char *restrict text,
   pthread_mutex_lock(&ctx->window_mutex);
   int col = ctx->window.window_size.ws_col;
   pthread_mutex_unlock(&ctx->window_mutex);
-  int lines = (len - 1) / (col - 2) + 1;
+  struct ParseResult text_parse = parse_new_line(text, col - 2);
+  const char **list = text_parse.list;
+  size_t lines = text_parse.lines;
   int last_idx = 0;
   switch (align_v) {
   case VERTICAL_TOP:
     last_idx = 1 + lines - 1;
     for (int i = 1; i <= last_idx; i++) {
-      char *partial_text = NULL;
-      if (last_idx == i) {
-        partial_text = malloc((len % (col - 2) + 1) * sizeof(char));
-        strncpy(partial_text, text, len % (col - 2));
-        partial_text[len % (col - 2)] = '\0';
-      } else {
-        partial_text = malloc((col - 1) * sizeof(char));
-        strncpy(partial_text, text, col - 2);
-        text += col - 2;
-        partial_text[col - 2] = '\0';
-      }
-      update_result(&result, simple_texth(ctx, partial_text, i, align_h));
+      update_result(&result, simple_texth(ctx, list[i - 1], i, align_h));
     }
     break;
   case VERTICAL_CENTER:
     last_idx = (ctx->window.window_size.ws_row - lines) / 2 + lines - 1;
     for (int i = (ctx->window.window_size.ws_row - lines) / 2; i <= last_idx;
          i++) {
-      char *partial_text = NULL;
-      if (last_idx == i) {
-        partial_text = malloc((len % (col - 2) + 1) * sizeof(char));
-        strncpy(partial_text, text, len % (col - 2));
-        partial_text[len % (col - 2)] = '\0';
-      } else {
-        partial_text = malloc((col - 1) * sizeof(char));
-        strncpy(partial_text, text, col - 2);
-        text += col - 2;
-        partial_text[col - 2] = '\0';
-      }
-      update_result(&result, simple_texth(ctx, partial_text, i, align_h));
+      update_result(
+          &result,
+          simple_texth(ctx,
+                       list[i - ((ctx->window.window_size.ws_row - lines) / 2)],
+                       i, align_h));
     }
     break;
   default:

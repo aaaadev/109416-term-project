@@ -4,6 +4,7 @@
         "menu.h": "c",
         "unistd.h": "c",
         "console.h": "c",
-        "cstdint": "c"
+        "cstdint": "c",
+        "stdlib.h": "c"
     }
 }
