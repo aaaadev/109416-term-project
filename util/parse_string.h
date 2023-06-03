@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #ifndef PARSE_STRING_H
 #define PARSE_STRING_H
 

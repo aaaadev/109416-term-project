@@ -9,7 +9,8 @@
 #include <string.h>
 
 // PRIVATE
-enum ConsoleResult key_event_another(const char * str, void *args, enum InputControll *cont) {
+enum ConsoleResult key_event_another(const char *str, void *args,
+                                     enum InputControll *cont) {
   char c = str[0];
   struct MenuCtx *ctx = args;
   switch (c) {
@@ -25,7 +26,8 @@ enum ConsoleResult key_event_another(const char * str, void *args, enum InputCon
 }
 
 // PRIVATE
-enum ConsoleResult key_event(const char * str, void *args, enum InputControll *cont) {
+enum ConsoleResult key_event(const char *str, void *args,
+                             enum InputControll *cont) {
   char c = str[0];
   struct MenuCtx *ctx = args;
   switch (c) {
@@ -47,14 +49,14 @@ enum ConsoleResult key_event(const char * str, void *args, enum InputControll *c
       ctx->items[ctx->current_select].is_selected = true;
       update_menu(ctx);
     }
-        *cont = INPUTC_CONTINUE;
+    *cont = INPUTC_CONTINUE;
     break;
   case 'C':
-      *cont = INPUTC_CONTINUE;
+    *cont = INPUTC_CONTINUE;
     // RIGHT
     break;
   case 'D':
-      *cont = INPUTC_CONTINUE;
+    *cont = INPUTC_CONTINUE;
     // LEFT
     break;
   default:
@@ -98,8 +100,11 @@ enum ConsoleResult on_view_menu(struct PageCtx *page_ctx, void *args) {
   if (row < 1) {
     return CRESULT_TOOLONGCOUNT;
   }
-  update_result(&result, simple_texth(ctx->ctx, strdup(ctx->name), row,
-                                      HORIZONTAL_CENTER));
+  char *buffer = malloc(strlen(ctx->name) + 10);
+  sprintf(buffer, "< %s >", ctx->name);
+  update_result(&result,
+                simple_texth(ctx->ctx, strdup(buffer), row, HORIZONTAL_CENTER));
+  free(buffer);
   row++;
   lines--;
   for (int i = row; i < row + lines; i++) {
@@ -136,8 +141,11 @@ enum ConsoleResult update_menu(struct MenuCtx *ctx) {
   if (row < 1) {
     return CRESULT_TOOLONGCOUNT;
   }
-  update_result(&result, simple_texth(ctx->ctx, strdup(ctx->name), row,
-                                      HORIZONTAL_CENTER));
+  char *buffer = malloc(strlen(ctx->name) + 10);
+  sprintf(buffer, "< %s >", ctx->name);
+  update_result(&result,
+                simple_texth(ctx->ctx, strdup(buffer), row, HORIZONTAL_CENTER));
+  free(buffer);
   row++;
   lines--;
   for (int i = row; i < row + lines; i++) {

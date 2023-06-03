@@ -63,16 +63,16 @@ void handle_input_arrow_inner(void *args) {
         enum InputControll cont = INPUTC_CONTINUE;
         ctx.func(str, ctx.args, &cont);
         if (cont == INPUTC_EXIT)
-            break;
+          break;
       }
     } else {
       char *str = malloc(sizeof(char) * 2);
       str[0] = c;
       str[1] = '\0';
-        enum InputControll cont = INPUTC_CONTINUE;
-        ctx.func_another(str, ctx.args, &cont);
-        if (cont == INPUTC_EXIT)
-            break;
+      enum InputControll cont = INPUTC_CONTINUE;
+      ctx.func_another(str, ctx.args, &cont);
+      if (cont == INPUTC_EXIT)
+        break;
     }
   }
   enum ConsoleResult res = CRESULT_SUCCESS;
@@ -90,7 +90,7 @@ void handle_input_line_inner(void *args) {
     if (newline != NULL) {
       *newline = '\0';
       enum InputControll cont = INPUTC_CONTINUE;
-        ctx.func(input, ctx.args, &cont);
+      ctx.func(input, ctx.args, &cont);
     } else {
 #ifdef DEBUG
       printf("error: buffer size overflow occurred. expected size: %ld\n",
@@ -108,21 +108,21 @@ void handle_input_line_inner(void *args) {
 // PRIVATE
 
 void handle_input_count_inner(void *args) {
-      enum ConsoleResult res = CRESULT_SUCCESS;
+  enum ConsoleResult res = CRESULT_SUCCESS;
   struct InputCtx ctx = *((struct InputCtx *)(args));
   char *str = malloc(sizeof(char) * (ctx.count + 1));
   char c = '\0';
   while (1) {
-  size_t cnt = 0;
-  while (cnt < ctx.count && (c = getchar()) != EOF) {
-    str[cnt] = c;
-    cnt++;
-  }
+    size_t cnt = 0;
+    while (cnt < ctx.count && (c = getchar()) != EOF) {
+      str[cnt] = c;
+      cnt++;
+    }
     str[cnt] = '\0';
     enum InputControll cont = INPUTC_CONTINUE;
-  update_result(&res, ctx.func(str, ctx.args, &cont));
+    update_result(&res, ctx.func(str, ctx.args, &cont));
     if (cont == INPUTC_EXIT)
-        break;
+      break;
   }
   pthread_exit((void *)res);
   return;

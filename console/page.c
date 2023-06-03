@@ -4,6 +4,7 @@
 #include "../debug.h"
 #include "console.h"
 #include <pthread.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,11 +22,16 @@ struct PageCtx *page_init(struct ConsoleCtx *ctx) {
   return page_ctx;
 }
 
-size_t add_page(struct PageCtx *ctx, page_func page_view) {
+enum ConsoleResult page_shutdown(struct PageCtx *ctx) {
+  return CRESULT_SUCCESS;
+}
+
+size_t add_page(struct PageCtx *ctx, page_func page_view, bool is_dummy) {
   pthread_mutex_lock(&ctx->page_mutex);
   ctx->pages =
       realloc(ctx->pages, sizeof(struct PageItem) * (ctx->page_count + 2));
-  ctx->pages[ctx->page_count] = (struct PageItem){ctx->page_count, page_view};
+  ctx->pages[ctx->page_count] =
+      (struct PageItem){ctx->page_count, page_view, is_dummy};
   ctx->page_count++;
   pthread_mutex_unlock(&ctx->page_mutex);
   return ctx->page_count - 1;
@@ -43,11 +49,12 @@ enum ConsoleResult navigate_page(struct PageCtx *ctx, size_t page_num,
     pthread_mutex_unlock(&ctx->page_mutex);
     return CRESULT_PAGENOTAVAILABLE;
   }
-
+  ctx->cur_page = page_num;
   ctx->history = realloc(ctx->history,
                          sizeof(struct PageHistory) * (ctx->history_size + 2));
   ctx->history[ctx->history_size] = (struct PageHistory){page_num, args_size};
-  ctx->history_args = realloc(ctx->history_args, sizeof(void*)*(ctx->history_size + 2));
+  ctx->history_args =
+      realloc(ctx->history_args, sizeof(void *) * (ctx->history_size + 2));
   ctx->history_args[ctx->history_size] = malloc(args_size);
   memcpy(ctx->history_args[ctx->history_size], args, args_size);
   ctx->history_size++;
@@ -69,13 +76,26 @@ enum ConsoleResult popback_page(struct PageCtx *ctx) {
   }
   ctx->history_size--;
   free(ctx->history_args[ctx->history_size]);
-  ctx->history_args = realloc(ctx->history_args, ctx->history_size + 2);
-  ctx->history = realloc(ctx->history, ctx->history_size + 2);
-  void *args = ctx->history_args[ctx->history_size-1];
+  ctx->history_args =
+      realloc(ctx->history_args, sizeof(void *) * (ctx->history_size + 2));
+  ctx->history = realloc(ctx->history,
+                         sizeof(struct PageHistory) * (ctx->history_size + 2));
+  while (ctx->pages[ctx->history[ctx->history_size - 1].page_num].is_dummy) {
+    ctx->history_size--;
+    free(ctx->history_args[ctx->history_size]);
+    ctx->history_args =
+        realloc(ctx->history_args, sizeof(void *) * (ctx->history_size + 2));
+    ctx->history = realloc(ctx->history, sizeof(struct PageHistory) *
+                                             (ctx->history_size + 2));
+  }
+  ctx->cur_page = ctx->history[ctx->history_size - 1].page_num;
   enum ConsoleResult result = CRESULT_SUCCESS;
+  printf("%d", ctx->history_size);
+  fflush(stdout);
   pthread_mutex_unlock(&ctx->page_mutex);
-  update_result(&result,
-                ctx->pages[ctx->history[ctx->history_size-1].page_num].page_draw(
-                    ctx, args));
+  update_result(
+      &result,
+      ctx->pages[ctx->history[ctx->history_size - 1].page_num].page_draw(
+          ctx, ctx->history_args[ctx->history_size - 1]));
   return result;
 }

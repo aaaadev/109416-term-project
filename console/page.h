@@ -5,6 +5,7 @@
 
 #include "console.h"
 #include <pthread.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 typedef enum ConsoleResult (*page_func)(struct PageCtx *, void *);
@@ -12,6 +13,7 @@ typedef enum ConsoleResult (*page_func)(struct PageCtx *, void *);
 struct PageItem {
   size_t page_num;
   page_func page_draw;
+  bool is_dummy;
 };
 
 struct PageHistory {
@@ -34,7 +36,7 @@ struct PageCtx {
 
 extern struct PageCtx *page_init(struct ConsoleCtx *ctx);
 extern enum ConsoleResult page_shutdown(struct PageCtx *ctx);
-extern size_t add_page(struct PageCtx *ctx, page_func page_view);
+extern size_t add_page(struct PageCtx *ctx, page_func page_view, bool is_dummy);
 extern enum ConsoleResult navigate_page(struct PageCtx *ctx, size_t page_num,
                                         const void *args, size_t args_size);
 extern enum ConsoleResult popback_page(struct PageCtx *ctx);

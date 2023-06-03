@@ -18,6 +18,8 @@ target_sources(lotto-645-simulator PRIVATE
     console/dialog.c
     chacha20/chacha20.c
     util/parse_string.c
+    pages/main_menu.c
+    pages/about_page.c
 )
 
 add_executable(simple_console tests/simple_console.c)

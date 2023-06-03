@@ -4,8 +4,8 @@
 #define DIALOG_H
 
 #include "console.h"
-#include "page.h"
 #include "input.h"
+#include "page.h"
 #include <stdlib.h>
 
 struct OkDialogConfig {
@@ -20,6 +20,7 @@ extern enum ConsoleResult on_view_ok_dialog(struct PageCtx *page_ctx,
 
 // PRIVATE fields
 
-enum ConsoleResult key_event_ok_dialog(const char * str, void *args, enum InputControll *cont);
+enum ConsoleResult key_event_ok_dialog(const char *str, void *args,
+                                       enum InputControll *cont);
 
 #endif

@@ -5,7 +5,7 @@
 #include "page.h"
 #include <stdbool.h>
 
-typedef void (*on_ok_function)(const struct MenuCtx *);
+typedef enum ConsoleResult (*on_ok_function)(const struct MenuCtx *);
 
 struct MenuItem {
   char *text;

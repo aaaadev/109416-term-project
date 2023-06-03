@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #include "parse_string.h"
 #include <stdlib.h>
 #include <string.h>
