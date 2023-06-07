@@ -131,7 +131,7 @@ enum ConsoleResult handle_key_multi_game(const char *text, void *args,
           err |= NOT_VALID_FILE_NAME;
         }
         size_t games = 0;
-        if (sscanf(number_of_games, "%lld", &games) != 1) {
+        if (sscanf(number_of_games, "%llu", &games) != 1) {
           err |= NOT_VALID_NUMBER_OF_GAMES;
         }
         if (err != 0) {
@@ -162,11 +162,11 @@ enum ConsoleResult handle_key_multi_game(const char *text, void *args,
               const char *prize_str = prize2string(prize);
               char *game_msg = malloc(sizeof(char) * 4096 * 2);
               sprintf(game_msg,
-                      "[#%lld]    Your numbers: %2lld %2lld %2lld %2lld %2lld "
-                      "%2lld\n"
-                      "[#%lld] Winning numbers: %2lld %2lld %2lld %2lld %2lld "
-                      "%2lld\n"
-                      "[#%lld]           Prize: %s (%lld won)\n",
+                      "[#%llu]    Your numbers: %2llu %2llu %2llu %2llu %2llu "
+                      "%2llu\n"
+                      "[#%llu] Winning numbers: %2llu %2llu %2llu %2llu %2llu "
+                      "%2llu\n"
+                      "[#%llu]           Prize: %s (%llu won)\n",
                       i + 1, user_numbers[0], user_numbers[1], user_numbers[2],
                       user_numbers[3], user_numbers[4], user_numbers[5], i + 1,
                       winning_numbers[0], winning_numbers[1],
