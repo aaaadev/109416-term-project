@@ -59,7 +59,7 @@ uint8_t *chacha20_random(size_t size, const uint8_t *key,
   uint8_t *buffer = malloc(sizeof(uint8_t) * size);
   struct ChaCha20Ctx ctx;
   chacha20_init(&ctx, key, nonce);
-  chacha20_xor(&ctx, &buffer, &buffer, size);
+  chacha20_xor(&ctx, buffer, buffer, size);
   return buffer;
 }
 

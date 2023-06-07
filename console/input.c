@@ -114,7 +114,7 @@ void handle_input_count_inner(void *args) {
   char c = '\0';
   while (1) {
     size_t cnt = 0;
-    while (cnt < ctx.count && (c = getchar()) != EOF) {
+    while (cnt < ctx.count && (read(STDIN_FILENO, &c, 1) == 1) == 1) {
       str[cnt] = c;
       cnt++;
     }

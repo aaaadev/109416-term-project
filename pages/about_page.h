@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #ifndef ABOUT_PAGE_H
 #define ABOUT_PAGE_H
 

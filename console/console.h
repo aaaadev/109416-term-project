@@ -45,6 +45,7 @@ struct Cursor {
 
 struct Window {
   char **data;
+  char **prev_data;
   struct winsize window_size;
 };
 

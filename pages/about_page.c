@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #include "about_page.h"
 #include "../console/console.h"
 #include "../console/dialog.h"

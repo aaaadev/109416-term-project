@@ -28,5 +28,12 @@ struct ParseResult parse_new_line(const char *_text, size_t max_per_line) {
     }
     text++;
   }
+  if (char_cnt > 0) {
+    list = realloc(list, sizeof(char *) * (lines + 1));
+    list[lines] = malloc(sizeof(char) * (char_cnt + 1));
+    memcpy(list[lines], text - (char_cnt), char_cnt);
+    char_cnt = 0;
+    lines++;
+  }
   return (struct ParseResult){list, lines};
 }

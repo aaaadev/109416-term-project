@@ -26,7 +26,7 @@ enum ConsoleResult on_view_ok_dialog(struct PageCtx *page_ctx, void *args) {
   text[len] = '\n';
   text[len + 1] = '\0';
   strcat(text, "> ok\n");
-  clear_all(ctx);
+  // clear_all(ctx);
   simple_textvh(ctx, text, HORIZONTAL_CENTER, VERTICAL_CENTER);
   free(text);
   handle_input_count(ctx, INPUT_DEFAULT, 1, key_event_ok_dialog, page_ctx);

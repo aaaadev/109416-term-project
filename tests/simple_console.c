@@ -26,7 +26,8 @@ int main(void) {
   struct ConsoleCtx *console = console_init();
   struct PageCtx *page = page_init(console);
   simple_textvh(console, "Loading", HORIZONTAL_CENTER, VERTICAL_CENTER);
-  struct MenuCtx *menu = menu_init(console, page, "Test menu", on_ok_test);
+  struct MenuCtx *menu =
+      menu_init(console, page, "Test menu", "test", on_ok_test);
   struct MenuItem first_item = (struct MenuItem){
       "this is first menu item",
       false,

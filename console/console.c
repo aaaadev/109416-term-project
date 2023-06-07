@@ -13,6 +13,7 @@
 
 struct ConsoleCtx *console_init(void) {
   struct ConsoleCtx *ctx = malloc(sizeof(struct ConsoleCtx));
+  printf("\e[?25l");
   pthread_mutex_init(&ctx->window_mutex, NULL);
   enable_raw_mode(ctx);
   pthread_mutex_lock(&ctx->window_mutex);
@@ -28,8 +29,15 @@ struct ConsoleCtx *console_init(void) {
     ctx->window.data[i] =
         (char *)malloc(sizeof(char) * (ctx->window.window_size.ws_col + 1));
   }
+  ctx->window.prev_data =
+      (char **)malloc(sizeof(char *) * (ctx->window.window_size.ws_row + 1));
+  for (int i = 0; i < ctx->window.window_size.ws_row; i++) {
+    ctx->window.prev_data[i] =
+        (char *)malloc(sizeof(char) * (ctx->window.window_size.ws_col + 1));
+  }
   pthread_mutex_unlock(&ctx->window_mutex);
   basic_draw(ctx);
+  clear_all(ctx);
   refresh_window(ctx);
   // MUST BE FREED LATER
   return ctx;
@@ -57,16 +65,21 @@ enum ConsoleResult basic_draw(struct ConsoleCtx *ctx) {
   pthread_mutex_lock(&ctx->window_mutex);
   for (int i = 0; i < ctx->window.window_size.ws_col; i++) {
     ctx->window.data[0][i] = '#';
+    ctx->window.prev_data[0][i] = ' ';
   }
   for (int i = 1; i < ctx->window.window_size.ws_row - 1; i++) {
     ctx->window.data[i][0] = '#';
+    ctx->window.prev_data[i][0] = ' ';
     for (int j = 1; j < ctx->window.window_size.ws_col - 1; j++) {
       ctx->window.data[i][j] = ' ';
+      ctx->window.prev_data[i][j] = ' ';
     }
     ctx->window.data[i][ctx->window.window_size.ws_col - 1] = '#';
+    ctx->window.prev_data[i][ctx->window.window_size.ws_col - 1] = ' ';
   }
   for (int i = 0; i < ctx->window.window_size.ws_col; i++) {
     ctx->window.data[ctx->window.window_size.ws_row - 1][i] = '#';
+    ctx->window.prev_data[ctx->window.window_size.ws_row - 1][i] = ' ';
   }
   pthread_mutex_unlock(&ctx->window_mutex);
   return CRESULT_SUCCESS;
@@ -75,14 +88,15 @@ enum ConsoleResult basic_draw(struct ConsoleCtx *ctx) {
 enum ConsoleResult refresh_window(struct ConsoleCtx *ctx) {
   enum ConsoleResult result = CRESULT_SUCCESS;
   update_result(&result, set_cursor(ctx, (struct Cursor){0, 0}));
-  raw_clear_console();
+  // raw_clear_console();
   pthread_mutex_lock(&ctx->window_mutex);
   for (int i = 0; i < ctx->window.window_size.ws_row; i++) {
     for (int j = 0; j < ctx->window.window_size.ws_col; j++) {
-      printf("%c", ctx->window.data[i][j]);
+      update_result(&result, set_cursor(ctx, (struct Cursor){i, j}));
+      if (ctx->window.prev_data[i][j] != ctx->window.data[i][j])
+        printf("%c", ctx->window.data[i][j]);
+      ctx->window.prev_data[i][j] = ctx->window.data[i][j];
     }
-    if (i != ctx->window.window_size.ws_row - 1)
-      printf("\n");
   }
   pthread_mutex_unlock(&ctx->window_mutex);
   fflush(stdout);
@@ -91,6 +105,7 @@ enum ConsoleResult refresh_window(struct ConsoleCtx *ctx) {
 }
 
 enum ConsoleResult console_shutdown(struct ConsoleCtx *restrict ctx) {
+  printf("\e[?25h");
   disable_raw_mode(ctx);
   pthread_mutex_destroy(&ctx->window_mutex);
   free(ctx);
@@ -114,10 +129,10 @@ enum ConsoleResult basic_text(struct ConsoleCtx *ctx, struct Cursor cur,
   } else {
     for (int i = cur.y; i < end_y; i++) {
       ctx->window.data[cur.x][i] = text[i - cur.y];
-      printf("%c", ctx->window.data[cur.x][i]);
+      // printf("%c", ctx->window.data[cur.x][i]);
     }
     pthread_mutex_unlock(&ctx->window_mutex);
-    fflush(stdout);
+    refresh_window(ctx);
     sync_cursor(ctx);
     return CRESULT_SUCCESS;
   }
@@ -130,6 +145,12 @@ enum ConsoleResult simple_textvh(struct ConsoleCtx *ctx, char *text,
   int len = strlen(text);
   pthread_mutex_lock(&ctx->window_mutex);
   int col = ctx->window.window_size.ws_col;
+  for (int i = 1; i < ctx->window.window_size.ws_row - 1; i++) {
+    for (int j = 1; j < col - 1; j++) {
+      ctx->window.prev_data[i][j] = ctx->window.data[i][j];
+      ctx->window.data[i][j] = ' ';
+    }
+  }
   pthread_mutex_unlock(&ctx->window_mutex);
   struct ParseResult text_parse = parse_new_line(text, col - 2);
   const char **list = text_parse.list;
@@ -249,6 +270,8 @@ void enable_raw_mode(struct ConsoleCtx *ctx) {
   tcgetattr(STDIN_FILENO, &ctx->original_termios);
   raw = ctx->original_termios;
   raw.c_lflag &= ~(ECHO | ICANON);
+  raw.c_cc[VERASE] = '\b';
+  raw.c_cc[VEOF] = '\n';
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
   ctx->current = raw;
   return;

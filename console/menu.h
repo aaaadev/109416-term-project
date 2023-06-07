@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #ifndef MENU_H
 #define MENU_H
 
@@ -13,7 +15,8 @@ struct MenuItem {
 };
 
 struct MenuCtx {
-  char *name;
+  const char *name;
+  const char *body;
   struct ConsoleCtx *ctx;
   struct PageCtx *page_ctx;
   size_t item_count;
@@ -25,7 +28,9 @@ struct MenuCtx {
 // PUBLIC fields
 
 extern struct MenuCtx *menu_init(struct ConsoleCtx *ctx,
-                                 struct PageCtx *page_ctx, char *restrict name,
+                                 struct PageCtx *page_ctx,
+                                 const char *restrict name,
+                                 const char *restrict body,
                                  on_ok_function on_ok);
 extern size_t add_item(struct MenuCtx *ctx, const struct MenuItem item);
 extern enum ConsoleResult on_view_menu(struct PageCtx *page_ctx, void *args);

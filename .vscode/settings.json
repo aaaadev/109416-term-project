@@ -5,6 +5,10 @@
         "unistd.h": "c",
         "console.h": "c",
         "cstdint": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "page.h": "c",
+        "stdio.h": "c",
+        "ctype.h": "c",
+        "multi_game_result.h": "c"
     }
 }
