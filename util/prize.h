@@ -1,10 +1,10 @@
 #ifndef PRIZE_H
 #define PRIZE_H
 
+#include "../constants.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include "../constants.h"
 
 enum Prize {
   NO_PRIZE,

@@ -105,19 +105,27 @@ enum ConsoleResult refresh_window(struct ConsoleCtx *ctx) {
 }
 
 enum ConsoleResult suspend_console(struct ConsoleCtx *ctx) {
-    raw_clear_console();
-    printf("\e[?25h");
-    set_cursor(ctx, (struct Cursor){ 0, 0 });
-    disable_raw_mode(ctx);
-    return CRESULT_SUCCESS;
+  raw_clear_console();
+  printf("\e[?25h");
+  set_cursor(ctx, (struct Cursor){0, 0});
+  disable_raw_mode(ctx);
+  pthread_mutex_lock(&ctx->window_mutex);
+for (int i = 0; i < ctx->window.window_size.ws_row; i++) {
+    for (int j = 0; j < ctx->window.window_size.ws_col; j++) {
+      ctx->window.prev_data[i][j] = '\0';
+    }
+  }
+  pthread_mutex_unlock(&ctx->window_mutex);
+  return CRESULT_SUCCESS;
 }
 
 enum ConsoleResult resume_console(struct ConsoleCtx *ctx) {
-    enable_raw_mode(ctx);
-    raw_clear_console();
-    set_cursor(ctx, (struct Cursor){ 0, 0 });
-    printf("\e[?25l");
-    return CRESULT_SUCCESS;
+  enable_raw_mode(ctx);
+  raw_clear_console();
+  set_cursor(ctx, (struct Cursor){0, 0});
+  printf("\e[?25l");
+  refresh_window(ctx);
+  return CRESULT_SUCCESS;
 }
 
 enum ConsoleResult console_shutdown(struct ConsoleCtx *restrict ctx) {

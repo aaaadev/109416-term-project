@@ -8,8 +8,8 @@
 
 struct ResultArgsMulti {
   struct PageCtx *page_ctx;
-    int64_t total_earned;
-    int64_t total_spent;
+  int64_t total_earned;
+  int64_t total_spent;
   size_t first_prize;
   size_t second_prize;
   size_t third_prize;

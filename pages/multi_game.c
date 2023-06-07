@@ -4,11 +4,12 @@
 #include "../console/console.h"
 #include "../console/input.h"
 #include "../console/page.h"
+#include "../constants.h"
 #include "../util/check_duplicate.h"
 #include "../util/generate_numbers.h"
 #include "../util/prize.h"
 #include "../util/split_whitespace.h"
-#include "../constants.h"
+#include "../util/generate_game_file_msg.h"
 #include "multi_game_result.h"
 #include <ctype.h>
 #include <stdint.h>
@@ -132,7 +133,8 @@ enum ConsoleResult handle_key_multi_game(const char *text, void *args,
           err |= NOT_VALID_FILE_NAME;
         }
         size_t games = 0;
-        if ((sscanf(number_of_games, "%llu", &games) != 1) || !(MIN_GAMES <= games && games <= MAX_GAMES)) {
+        if ((sscanf(number_of_games, "%llu", &games) != 1) ||
+            !(MIN_GAMES <= games && games <= MAX_GAMES)) {
           err |= NOT_VALID_NUMBER_OF_GAMES;
         }
         if (err != 0) {
@@ -166,19 +168,7 @@ enum ConsoleResult handle_key_multi_game(const char *text, void *args,
               enum Prize prize = calculate_prize(user_numbers, winning_numbers);
               int64_t bal = balance(prize);
               const char *prize_str = prize2string(prize);
-              char *game_msg = malloc(sizeof(char) * 4096 * 2);
-              sprintf(game_msg,
-                      "[#%zu]    Your numbers: %2llu %2llu %2llu %2llu %2llu "
-                      "%2llu\n"
-                      "[#%zu] Winning numbers: %2llu %2llu %2llu %2llu %2llu "
-                      "%2llu\n"
-                      "[#%zu]           Prize: %s (%lld won)\n",
-                      i + 1, user_numbers[0], user_numbers[1], user_numbers[2],
-                      user_numbers[3], user_numbers[4], user_numbers[5], i + 1,
-                      winning_numbers[0], winning_numbers[1],
-                      winning_numbers[2], winning_numbers[3],
-                      winning_numbers[4], winning_numbers[5], i + 1, prize_str,
-                      bal);
+              const char *game_msg = generate_game_file_msg(i+1, user_numbers, winning_numbers);
               fputs(game_msg, file);
               free(game_msg);
               total_spent += (int64_t)GAME_PRICE;
@@ -210,24 +200,18 @@ enum ConsoleResult handle_key_multi_game(const char *text, void *args,
               free(winning_numbers);
             }
             char *game_statmsg = malloc(sizeof(char) * 4096 * 2);
-            sprintf(game_statmsg, 
-            "[statistics]  First prize: %zu (%lld won)\n"
-            "[statistics] Second prize: %zu (%lld won)\n"
-            "[statistics]  Third prize: %zu (%lld won)\n"
-            "[statistics]  Forth prize: %zu (%lld won)\n"
-            "[statistics]     No prize: %zu (%lld won)\n"
-            "[statistics] Total spent: %lld\n"
-            "[statistics] Total earned: %lld\n"
-            "[statistics] Total margin (earned - spent): %lld\n",
-            cnt_first, first_earned,
-            cnt_second, second_earned,
-            cnt_third, third_earned,
-            cnt_forth, forth_earned,
-            cnt_no, 0ll,
-            total_spent,
-            total_earned,
-            total_earned - total_spent
-            );
+            sprintf(game_statmsg,
+                    "[statistics]  First prize: %zu (%lld won)\n"
+                    "[statistics] Second prize: %zu (%lld won)\n"
+                    "[statistics]  Third prize: %zu (%lld won)\n"
+                    "[statistics]  Forth prize: %zu (%lld won)\n"
+                    "[statistics]     No prize: %zu (%lld won)\n"
+                    "[statistics] Total spent: %lld\n"
+                    "[statistics] Total earned: %lld\n"
+                    "[statistics] Total margin (earned - spent): %lld\n",
+                    cnt_first, first_earned, cnt_second, second_earned,
+                    cnt_third, third_earned, cnt_forth, forth_earned, cnt_no,
+                    0ll, total_spent, total_earned, total_earned - total_spent);
             free(game_statmsg);
             fputs(game_statmsg, file);
             fflush(file);

@@ -7,12 +7,27 @@
 #include "../util/check_duplicate.h"
 #include "../util/generate_numbers.h"
 #include "../util/split_whitespace.h"
+#include "../util/generate_game_file_msg.h"
 #include "single_game_result.h"
 #include <ctype.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdatomic.h>
+
+static atomic_bool is_stop = ATOMIC_VAR_INIT(false);
+
+void* stop_handler(void* arg) {
+    while (!is_stop) {
+        char c = '\0';
+        if ((c = getchar()) == '\n') {
+            atomic_store(&is_stop, true);
+        }
+    }
+    pthread_exit(NULL);
+    return NULL;
+}
 
 // PRIVATE
 static enum ConsoleResult draw_view(struct ConsoleCtx *ctx, size_t cur,
@@ -110,63 +125,65 @@ enum ConsoleResult handle_key_single_game_file(const char *text, void *args,
                                           INVALID_FILE_FORMAT));
             *cont = INPUTC_CONTINUE;
           } else {
-            struct SplitResult split = split_whitespace((const char *)line);
-            if (split.length != 6) {
-              if (split.length == 1 && strlen(split.data[0]) == 1 &&
-                  split.data[0][0] == 'A') {
-                // automatic
-                uint64_t *user_nums = generate_numbers();
-                uint64_t *winning_nums = generate_numbers();
-                struct ResultArgs *res_args = malloc(sizeof(struct ResultArgs));
-                res_args->page_ctx = data->page_ctx;
-                res_args->user_nums = user_nums;
-                res_args->winning_nums = winning_nums;
-                size_t idx =
-                    add_page(data->page_ctx, on_view_single_game_result, true);
-                update_result(&res, navigate_page(data->page_ctx, idx, res_args,
-                                                  sizeof(*res_args)));
-                *cont = INPUTC_EXIT;
-              } else {
-                update_result(&res, draw_view(data->page_ctx->ctx, data->cur,
-                                              str, INVALID_FILE_FORMAT));
-                *cont = INPUTC_CONTINUE;
-              }
-            } else {
-              uint64_t *num = malloc(sizeof(uint64_t) * 6);
-              if (sscanf(line, "%lld %lld %lld %lld %lld %lld", &num[0],
-                         &num[1], &num[2], &num[3], &num[4], &num[5],
-                         &num[6]) == 6) {
-                bool range_check = true;
-                bool duplicate_check = check_duplicate(num);
-                for (int i = 0; i < 6; i++) {
-                  if (!(num[i] >= 1 && num[i] <= 45)) {
-                    range_check = false;
-                  }
-                }
-                if (!range_check || duplicate_check) {
-                  update_result(&res, draw_view(data->page_ctx->ctx, data->cur,
-                                                str, INVALID_FILE_FORMAT));
-                  *cont = INPUTC_CONTINUE;
-                } else {
+            rewind(file);
+            suspend_console(data->page_ctx->ctx);
+            printf(
+                "Starting console raw mode to print game results directly.\n"
+                "If you want to stop while printing results, press enter key.\n");
+            size_t idx = 0;
+            pthread_t stop_handler_tid;
+            pthread_create(&stop_handler_tid, NULL, stop_handler, NULL);
+            while (fgets(line, 4096, file) != NULL) {
+                ++idx;
+              struct SplitResult split = split_whitespace((const char *)line);
+              if (split.length != 6) {
+                if (split.length == 1 && strlen(split.data[0]) == 1 &&
+                    split.data[0][0] == 'A') {
+                  // automatic
+                  uint64_t *user_nums = generate_numbers();
                   uint64_t *winning_nums = generate_numbers();
-                  struct ResultArgs *res_args =
-                      malloc(sizeof(struct ResultArgs));
-                  res_args->page_ctx = data->page_ctx;
-                  res_args->user_nums = num;
-                  res_args->winning_nums = winning_nums;
-                  size_t idx = add_page(data->page_ctx,
-                                        on_view_single_game_result, true);
-                  update_result(&res,
-                                navigate_page(data->page_ctx, idx, res_args,
-                                              sizeof(*res_args)));
-                  *cont = INPUTC_EXIT;
+                  printf("%s", generate_game_file_msg(idx, user_nums, winning_nums));
+                } else {
+                  printf("%s", generate_invalid_msg(idx));
                 }
               } else {
-                update_result(&res, draw_view(data->page_ctx->ctx, data->cur,
-                                              str, INVALID_FILE_FORMAT));
-                *cont = INPUTC_CONTINUE;
+                uint64_t *num = malloc(sizeof(uint64_t) * 6);
+                if (sscanf(line, "%llu %llu %llu %llu %llu %llu", &num[0],
+                           &num[1], &num[2], &num[3], &num[4], &num[5],
+                           &num[6]) == 6) {
+                  bool range_check = true;
+                  bool duplicate_check = check_duplicate(num);
+                  for (int i = 0; i < 6; i++) {
+                    if (!(num[i] >= 1 && num[i] <= 45)) {
+                      range_check = false;
+                    }
+                  }
+                  if (!range_check || duplicate_check) {
+                    printf("%s", generate_invalid_msg(idx));
+                  } else {
+                    uint64_t *winning_nums = generate_numbers();
+                    printf("%s", generate_game_file_msg(idx, num, winning_nums));
+                  }
+                } else {
+                  printf("%s", generate_invalid_msg(idx));
+                }
+                free(num);
+              }
+              fflush(stdout);
+              if (atomic_load(&is_stop)) {
+                printf("Stopping print out results.");
+                break;
               }
             }
+            if (!atomic_load(&is_stop)) {
+                printf("Press enter key to return the main menu.");
+                fflush(stdout);
+            }
+            atomic_store(&is_stop, false);
+            pthread_join(stop_handler_tid, NULL);
+            resume_console(data->page_ctx->ctx);
+            update_result(&res, popback_page(data->page_ctx));
+            *cont = INPUTC_EXIT;
           }
         }
         fclose(file);
