@@ -4,6 +4,7 @@
 #include "../console/console.h"
 #include "../console/page.h"
 #include <stdlib.h>
+#include <stdint.h>
 
 struct ResultArgsMulti {
   struct PageCtx *page_ctx;

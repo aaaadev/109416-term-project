@@ -6,6 +6,7 @@
 #include "../console/console.h"
 #include "../console/page.h"
 #include <stdlib.h>
+#include <stdint.h>
 
 struct ResultArgs {
   struct PageCtx *page_ctx;
