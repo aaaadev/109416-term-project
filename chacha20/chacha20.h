@@ -3,6 +3,10 @@
 #ifndef CHACHA20_H
 #define CHACHA20_H
 
+#define ROUNDS 20
+#define KEY_LEN 32
+#define NONCE_LEN 12
+
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -13,9 +17,6 @@ typedef struct ChaCha20Ctx {
 };
 
 // https://en.wikipedia.org/wiki/Salsa20#ChaCha_variant from pseudo C code
-static const size_t ROUNDS = 20;
-static const size_t KEY_LEN = 32;
-static const size_t NONCE_LEN = 12;
 static const char SALSA20[17] = "expand 32-byte k";
 
 static uint32_t rotl(uint32_t a, int b) { return (a << b) | (a >> (32 - b)); }
