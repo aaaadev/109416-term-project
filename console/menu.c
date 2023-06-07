@@ -18,12 +18,14 @@ enum ConsoleResult key_event_another(const char *str, void *args,
   switch (c) {
   case '\n':
     // TODO
+    ctx->items[ctx->current_select].is_selected = false;
     ctx->on_ok(ctx);
     *cont = INPUTC_EXIT;
     break;
   default:
     break;
   }
+
   return CRESULT_SUCCESS;
 }
 
