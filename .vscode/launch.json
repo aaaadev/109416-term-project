@@ -8,7 +8,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Debug",
-            "program": "${workspaceFolder}/build/lotto-645-simulator",
+            "program": "${workspaceFolder}/build/lotto-645-simulator_darwin-arm64_debug",
             "args": [],
             "cwd": "${workspaceFolder}",
         }

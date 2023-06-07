@@ -50,6 +50,7 @@ target_sources(lotto-645-simulator PRIVATE
     pages/single_game_file.c
     pages/multi_game.c
     pages/multi_game_result.c
+    main_signal.c
 )
 
 add_executable(simple_console tests/simple_console.c)
@@ -69,6 +70,7 @@ pages/single_game_result.c
 pages/single_game_file.c
 pages/multi_game.c
 pages/multi_game_result.c
+main_signal.c
 )
 
 add_test(NAME simple_console COMMAND simple_console)

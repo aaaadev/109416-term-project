@@ -9,6 +9,7 @@
 #include "multi_game.h"
 #include "single_game.h"
 #include "single_game_file.h"
+#include "../main_signal.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -29,7 +30,18 @@ enum ConsoleResult on_ok_main_menu(const struct MenuCtx *menu) {
   } else if (menu->current_select == 2) {
     size_t idx = add_page(page_ctx, on_view_multi_game, false);
     update_result(&res, navigate_page(page_ctx, idx, NULL, 0));
-  } else {
+  } else if (menu->current_select == 4) {
+      enum MainSignal *main_signal = getter_main_signal();
+  pthread_mutex_t *signal_mutex = getter_signal_mutex();
+  pthread_cond_t *signal_cond = getter_signal_cond();
+    pthread_mutex_lock(signal_mutex);
+    #ifdef DEBUG
+      DPRINTF("signal_mutex is locked.\n");
+    #endif
+    *main_signal = QUIT;
+    pthread_cond_signal(signal_cond);
+    pthread_mutex_unlock(signal_mutex);  
+    } else {
 #ifdef DEBUG
     DPRINTF("unknown item select handle\n");
     fflush(stdout);
@@ -59,10 +71,15 @@ enum ConsoleResult on_view_main(struct PageCtx *page_ctx, void *args) {
       "4. About",
       false,
   };
+    struct MenuItem fifth_item = (struct MenuItem){
+      "5. Quit",
+      false,
+  };
   update_result(&res, add_item(menu, (const struct MenuItem)first_item));
   update_result(&res, add_item(menu, (const struct MenuItem)second_item));
   update_result(&res, add_item(menu, (const struct MenuItem)third_item));
   update_result(&res, add_item(menu, (const struct MenuItem)forth_item));
+  update_result(&res, add_item(menu, (const struct MenuItem)fifth_item));
   size_t idx = add_page(page_ctx, on_view_menu, false);
   update_result(&res, navigate_page(page_ctx, idx, menu, sizeof(*menu)));
   return CRESULT_SUCCESS;

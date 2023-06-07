@@ -10,6 +10,8 @@
         "stdio.h": "c",
         "ctype.h": "c",
         "multi_game_result.h": "c",
-        "multi_game.h": "c"
+        "multi_game.h": "c",
+        "single_game_file.h": "c",
+        "main_signal.h": "c"
     }
 }
