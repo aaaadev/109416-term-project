@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+struct PageCtx;
 typedef enum ConsoleResult (*page_func)(struct PageCtx *, void *);
 
 struct PageItem {

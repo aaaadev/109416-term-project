@@ -42,7 +42,7 @@ enum ConsoleResult navigate_page(struct PageCtx *ctx, size_t page_num,
   pthread_mutex_lock(&ctx->page_mutex);
   if (page_num >= ctx->page_count) {
 #ifdef DEBUG
-    DPRINTF("warning: page_num(%Ld) >= ctx->page_count(%Ld)\n", page_num,
+    DPRINTF("warning: page_num(%zu) >= ctx->page_count(%zu)\n", page_num,
             ctx->page_count);
     fflush(stdout);
 #endif

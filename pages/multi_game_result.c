@@ -33,8 +33,8 @@ enum ConsoleResult on_view_multi_game_result(struct PageCtx *page_ctx,
   struct ResultArgsMulti *args = inner_args;
   char body[4096];
   sprintf(body,
-          "first prize: %lld\nsecond prize: %lld\nthird prize: %lld\nforth "
-          "prize: %lld\nno prize: %lld\ntotal balance: %lld won",
+          "first prize: %zu\nsecond prize: %zu\nthird prize: %zu\nforth "
+          "prize: %zu\nno prize: %zu\ntotal balance: %lld won",
           args->first_prize, args->second_prize, args->third_prize,
           args->forth_prize, args->no_prize, args->total_balance);
   struct MenuCtx *menu = menu_init(page_ctx->ctx, page_ctx, "Game result", body,

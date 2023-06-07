@@ -12,4 +12,4 @@
 extern enum ConsoleResult on_view_about_page(struct PageCtx *page_ctx,
                                              void *args);
 
-#endif ABOUT_PAGE_H
+#endif

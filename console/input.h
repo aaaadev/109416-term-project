@@ -6,11 +6,6 @@
 #include "console.h"
 #include <pthread.h>
 
-typedef enum ConsoleResult (*handle_key)(const char *, void *,
-                                         enum InputControll *);
-typedef enum ConsoleResult (*handle_another_key)(const char *, void *,
-                                                 enum InputControll *);
-
 enum InputOptions {
   INPUT_DEFAULT = 0b0,
   INPUT_BACKSPACE_ALLOWED = 0b10,
@@ -20,6 +15,11 @@ enum InputControll {
   INPUTC_CONTINUE = 0x00,
   INPUTC_EXIT = 0x01,
 };
+
+typedef enum ConsoleResult (*handle_key)(const char *, void *,
+                                         enum InputControll *);
+typedef enum ConsoleResult (*handle_another_key)(const char *, void *,
+                                                 enum InputControll *);
 
 struct InputCtx {
   struct ConsoleCtx *ctx;

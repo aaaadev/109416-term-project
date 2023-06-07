@@ -14,7 +14,7 @@ typedef struct ChaCha20Ctx {
   uint32_t state[16];
   uint32_t buffer[16];
   size_t available;
-};
+} ChaCha20Ctx;
 
 // https://en.wikipedia.org/wiki/Salsa20#ChaCha_variant from pseudo C code
 static const char SALSA20[17] = "expand 32-byte k";
