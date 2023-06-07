@@ -5,11 +5,11 @@
 #include "../console/menu.h"
 #include "../console/page.h"
 #include "../debug.h"
+#include "../main_signal.h"
 #include "about_page.h"
 #include "multi_game.h"
 #include "single_game.h"
 #include "single_game_file.h"
-#include "../main_signal.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -31,17 +31,17 @@ enum ConsoleResult on_ok_main_menu(const struct MenuCtx *menu) {
     size_t idx = add_page(page_ctx, on_view_multi_game, false);
     update_result(&res, navigate_page(page_ctx, idx, NULL, 0));
   } else if (menu->current_select == 4) {
-      enum MainSignal *main_signal = getter_main_signal();
-  pthread_mutex_t *signal_mutex = getter_signal_mutex();
-  pthread_cond_t *signal_cond = getter_signal_cond();
+    enum MainSignal *main_signal = getter_main_signal();
+    pthread_mutex_t *signal_mutex = getter_signal_mutex();
+    pthread_cond_t *signal_cond = getter_signal_cond();
     pthread_mutex_lock(signal_mutex);
-    #ifdef DEBUG
-      DPRINTF("signal_mutex is locked.\n");
-    #endif
+#ifdef DEBUG
+    DPRINTF("signal_mutex is locked.\n");
+#endif
     *main_signal = QUIT;
     pthread_cond_signal(signal_cond);
-    pthread_mutex_unlock(signal_mutex);  
-    } else {
+    pthread_mutex_unlock(signal_mutex);
+  } else {
 #ifdef DEBUG
     DPRINTF("unknown item select handle\n");
     fflush(stdout);
@@ -71,7 +71,7 @@ enum ConsoleResult on_view_main(struct PageCtx *page_ctx, void *args) {
       "4. About",
       false,
   };
-    struct MenuItem fifth_item = (struct MenuItem){
+  struct MenuItem fifth_item = (struct MenuItem){
       "5. Quit",
       false,
   };
