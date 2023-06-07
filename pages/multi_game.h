@@ -16,6 +16,7 @@ enum FileErrorMulti {
   ALREADY_EXISTS_FILE = 0b10,
   NOT_VALID_FILE_NAME = 0b100,
   NOT_VALID_NUMBER_OF_GAMES = 0b1000,
+  ERROR_FILE_OPEN = 0b10000,
 };
 
 static const char *MSG_MULTI = "< Multi game mode >\n";
@@ -26,6 +27,8 @@ static const char *MSG_ALREADY_EXISTS_MULTI =
 static const char *MSG_NOT_VALID_FILE_NAME_MULTI = "File name is not valid.\n";
 static const char *MSG_NOT_VALID_NUMBER_OF_GAMES_MULTI =
     "Number of games is not valid.\n";
+static const char *MSG_ERROR_FILE_OPEN_MULTI =
+    "An error occurred while file open.\n";
 
 struct HandleKeyDataMulti {
   struct PageCtx *page_ctx;

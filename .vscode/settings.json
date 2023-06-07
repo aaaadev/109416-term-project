@@ -9,6 +9,7 @@
         "page.h": "c",
         "stdio.h": "c",
         "ctype.h": "c",
-        "multi_game_result.h": "c"
+        "multi_game_result.h": "c",
+        "multi_game.h": "c"
     }
 }

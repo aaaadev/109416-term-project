@@ -132,7 +132,7 @@ enum ConsoleResult handle_key_single_game_file(const char *text, void *args,
                 *cont = INPUTC_CONTINUE;
               }
             } else {
-              uint64_t *num = malloc(sizeof(int) * 6);
+              uint64_t *num = malloc(sizeof(uint64_t) * 6);
               if (sscanf(line, "%lld %lld %lld %lld %lld %lld", &num[0],
                          &num[1], &num[2], &num[3], &num[4], &num[5],
                          &num[6]) == 6) {
