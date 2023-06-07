@@ -6,10 +6,10 @@
 #include "../console/page.h"
 #include "../constants.h"
 #include "../util/check_duplicate.h"
+#include "../util/generate_game_file_msg.h"
 #include "../util/generate_numbers.h"
 #include "../util/prize.h"
 #include "../util/split_whitespace.h"
-#include "../util/generate_game_file_msg.h"
 #include "multi_game_result.h"
 #include <ctype.h>
 #include <stdint.h>
@@ -168,7 +168,8 @@ enum ConsoleResult handle_key_multi_game(const char *text, void *args,
               enum Prize prize = calculate_prize(user_numbers, winning_numbers);
               int64_t bal = balance(prize);
               const char *prize_str = prize2string(prize);
-              const char *game_msg = generate_game_file_msg(i+1, user_numbers, winning_numbers);
+              const char *game_msg =
+                  generate_game_file_msg(i + 1, user_numbers, winning_numbers);
               fputs(game_msg, file);
               free(game_msg);
               total_spent += (int64_t)GAME_PRICE;

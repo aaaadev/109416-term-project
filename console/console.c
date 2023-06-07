@@ -110,7 +110,7 @@ enum ConsoleResult suspend_console(struct ConsoleCtx *ctx) {
   set_cursor(ctx, (struct Cursor){0, 0});
   disable_raw_mode(ctx);
   pthread_mutex_lock(&ctx->window_mutex);
-for (int i = 0; i < ctx->window.window_size.ws_row; i++) {
+  for (int i = 0; i < ctx->window.window_size.ws_row; i++) {
     for (int j = 0; j < ctx->window.window_size.ws_col; j++) {
       ctx->window.prev_data[i][j] = '\0';
     }

@@ -5,28 +5,29 @@
 #include "../console/input.h"
 #include "../console/page.h"
 #include "../util/check_duplicate.h"
+#include "../util/generate_game_file_msg.h"
 #include "../util/generate_numbers.h"
 #include "../util/split_whitespace.h"
-#include "../util/generate_game_file_msg.h"
 #include "single_game_result.h"
 #include <ctype.h>
+#include <stdatomic.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdatomic.h>
 
 static atomic_bool is_stop = ATOMIC_VAR_INIT(false);
 
-void* stop_handler(void* arg) {
-    while (!is_stop) {
-        char c = '\0';
-        if ((c = getchar()) == '\n') {
-            atomic_store(&is_stop, true);
-        }
+void *stop_handler(void *arg) {
+  while (!is_stop) {
+    char c = '\0';
+    if ((c = getchar()) == '\n') {
+      atomic_store(&is_stop, true);
+      break;
     }
-    pthread_exit(NULL);
-    return NULL;
+  }
+  pthread_exit(NULL);
+  return NULL;
 }
 
 // PRIVATE
@@ -127,14 +128,15 @@ enum ConsoleResult handle_key_single_game_file(const char *text, void *args,
           } else {
             rewind(file);
             suspend_console(data->page_ctx->ctx);
-            printf(
-                "Starting console raw mode to print game results directly.\n"
-                "If you want to stop while printing results, press enter key.\n");
+            printf("Starting console raw mode to print game results directly.\n"
+                   "If you want to stop while printing results, press enter "
+                   "key.\n");
+            atomic_store(&is_stop, false);
             size_t idx = 0;
             pthread_t stop_handler_tid;
             pthread_create(&stop_handler_tid, NULL, stop_handler, NULL);
             while (fgets(line, 4096, file) != NULL) {
-                ++idx;
+              ++idx;
               struct SplitResult split = split_whitespace((const char *)line);
               if (split.length != 6) {
                 if (split.length == 1 && strlen(split.data[0]) == 1 &&
@@ -142,7 +144,8 @@ enum ConsoleResult handle_key_single_game_file(const char *text, void *args,
                   // automatic
                   uint64_t *user_nums = generate_numbers();
                   uint64_t *winning_nums = generate_numbers();
-                  printf("%s", generate_game_file_msg(idx, user_nums, winning_nums));
+                  printf("%s",
+                         generate_game_file_msg(idx, user_nums, winning_nums));
                 } else {
                   printf("%s", generate_invalid_msg(idx));
                 }
@@ -162,7 +165,8 @@ enum ConsoleResult handle_key_single_game_file(const char *text, void *args,
                     printf("%s", generate_invalid_msg(idx));
                   } else {
                     uint64_t *winning_nums = generate_numbers();
-                    printf("%s", generate_game_file_msg(idx, num, winning_nums));
+                    printf("%s",
+                           generate_game_file_msg(idx, num, winning_nums));
                   }
                 } else {
                   printf("%s", generate_invalid_msg(idx));
@@ -176,8 +180,8 @@ enum ConsoleResult handle_key_single_game_file(const char *text, void *args,
               }
             }
             if (!atomic_load(&is_stop)) {
-                printf("Press enter key to return the main menu.");
-                fflush(stdout);
+              printf("Press enter key to return the main menu.");
+              fflush(stdout);
             }
             atomic_store(&is_stop, false);
             pthread_join(stop_handler_tid, NULL);
