@@ -3,6 +3,8 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
+#include "../constants.h"
 
 enum Prize {
   NO_PRIZE,
@@ -12,19 +14,19 @@ enum Prize {
   FORTH_PRIZE,
 };
 
-static inline uint64_t balance(enum Prize prize) {
+static inline int64_t balance(enum Prize prize) {
   switch (prize) {
   case FIRST_PRIZE:
-    return 2000000000;
+    return FIRST_PRIZE_PRICE;
     break;
   case SECOND_PRIZE:
-    return 2000000;
+    return SECOND_PRIZE_PRICE;
     break;
   case THIRD_PRIZE:
-    return 50000;
+    return THIRD_PRIZE_PRICE;
     break;
   case FORTH_PRIZE:
-    return 5000;
+    return FORTH_PRIZE_PRICE;
     break;
   default:
     break;
@@ -59,6 +61,7 @@ static inline enum Prize calculate_prize(uint64_t *user_numbers,
                                          uint64_t *winning_numbers) {
   int cnt = 0;
   bool fill[45];
+  memset(fill, 0, sizeof(fill));
   for (int i = 0; i < 6; i++)
     fill[user_numbers[i] - 1] = true;
   for (int i = 0; i < 6; i++)

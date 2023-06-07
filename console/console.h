@@ -78,6 +78,8 @@ extern enum ConsoleResult simple_textvh(struct ConsoleCtx *ctx, char *text,
 extern enum ConsoleResult simple_texth(struct ConsoleCtx *ctx,
                                        char *restrict text, int row,
                                        enum TextAlignHorizontal align_h);
+extern enum ConsoleResult suspend_console(struct ConsoleCtx *ctx);
+extern enum ConsoleResult resume_console(struct ConsoleCtx *ctx);
 
 // PRIVATE fields
 void enable_raw_mode(struct ConsoleCtx *ctx);

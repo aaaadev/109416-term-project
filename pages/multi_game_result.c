@@ -33,10 +33,16 @@ enum ConsoleResult on_view_multi_game_result(struct PageCtx *page_ctx,
   struct ResultArgsMulti *args = inner_args;
   char body[4096];
   sprintf(body,
-          "first prize: %zu\nsecond prize: %zu\nthird prize: %zu\nforth "
-          "prize: %zu\nno prize: %zu\ntotal balance: %lld won",
-          args->first_prize, args->second_prize, args->third_prize,
-          args->forth_prize, args->no_prize, args->total_balance);
+          "first prize: %zu (%lld won)\nsecond prize: %zu (%lld won)\nthird prize: %zu (%lld won)\nforth "
+          "prize: %zu (%lld won)\nno prize: %zu (%lld won)\ntotal spent: %lld won\ntotal earned: %lld won\ntotal margin (earned - spent): %lld won",
+          args->first_prize, (int64_t)(args->first_prize)*FIRST_PRIZE_PRICE, 
+          args->second_prize, (int64_t)(args->second_prize)*SECOND_PRIZE_PRICE,
+          args->third_prize, (int64_t)(args->third_prize)*THIRD_PRIZE_PRICE,
+          args->forth_prize, (int64_t)(args->forth_prize)*FORTH_PRIZE_PRICE,
+          args->no_prize, 0ll,
+          args->total_spent,
+          args->total_earned,
+          args->total_earned - args->total_spent);
   struct MenuCtx *menu = menu_init(page_ctx->ctx, page_ctx, "Game result", body,
                                    on_ok_multi_game_result);
   struct MenuItem retry_item = (struct MenuItem){

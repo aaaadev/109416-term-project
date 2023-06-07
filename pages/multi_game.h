@@ -21,7 +21,7 @@ enum FileErrorMulti {
 
 static const char *MSG_MULTI = "< Multi game mode >\n";
 static const char *MSG_MULTI2 =
-    "Please enter a output filename and number of games\n";
+    "Please enter a output filename and number of games.\nNumber of games should range between 1,000 to 1,000,000.\n";
 static const char *MSG_ALREADY_EXISTS_MULTI =
     "File already exists. Try again.\n";
 static const char *MSG_NOT_VALID_FILE_NAME_MULTI = "File name is not valid.\n";
