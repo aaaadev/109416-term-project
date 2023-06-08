@@ -12,6 +12,7 @@
         "multi_game_result.h": "c",
         "multi_game.h": "c",
         "single_game_file.h": "c",
-        "main_signal.h": "c"
+        "main_signal.h": "c",
+        "__node_handle": "c"
     }
 }
