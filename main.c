@@ -11,10 +11,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <time.h>
 
 const unsigned int DELAY_SECS = 1;
 
 int main(void) {
+  srand(time(NULL));
   enum MainSignal *main_signal = getter_main_signal();
   pthread_mutex_t *signal_mutex = getter_signal_mutex();
   pthread_cond_t *signal_cond = getter_signal_cond();

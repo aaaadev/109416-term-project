@@ -73,6 +73,12 @@ pages/multi_game_result.c
 main_signal.c
 )
 
+add_executable(generator generator.c)
+target_sources(generator PRIVATE
+chacha20/chacha20.c
+util/parse_string.c
+util/split_whitespace.c)
+
 add_test(NAME simple_console COMMAND simple_console)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

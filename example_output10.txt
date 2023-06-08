@@ -1,0 +1,82 @@
+################################################################################
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                             < Single game mode >                             #
+#Please enter a valid filename has 6 integers between 1 to 45 which is separate#
+#                               d by whitespace                                #
+#                   input: term-project/example_input10.txt                    #
+#                                     > ok                                     #
+#                                     back                                     #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+################################################################################
+Starting console raw mode to print game results directly.
+If you want to stop while printing results, press enter key.
+[#1]    Your numbers:  6 36 22 33 28 45
+[#1] Winning numbers: 26  7  2  8 45 32
+[#1]           Prize: no prize (0 won)
+[#2]    Your numbers: 25 26 17  6 28 27
+[#2] Winning numbers: 43 11 35 26 22 12
+[#2]           Prize: no prize (0 won)
+[#3]    Your numbers: 36 35 11 12  9 37
+[#3] Winning numbers: 40 36 27 32 18  8
+[#3]           Prize: no prize (0 won)
+[#4]    Your numbers: 11 37 22 10  4 33
+[#4] Winning numbers:  3 33 42 40 17 41
+[#4]           Prize: no prize (0 won)
+[#5]    Your numbers: 34 31 13 44  4 42
+[#5] Winning numbers: 29 39 28 41 16 27
+[#5]           Prize: no prize (0 won)
+[#6]    Your numbers:  2 10  9 17 20 13
+[#6] Winning numbers: 31  6 21 30 35 34
+[#6]           Prize: no prize (0 won)
+[#7]    Your numbers: 14 18 34 44 15 39
+[#7] Winning numbers: 26 24 39 22 16 29
+[#7]           Prize: no prize (0 won)
+[#8]    Your numbers: 29  7 21 32 24  4
+[#8] Winning numbers:  9 22  3 45 39 15
+[#8]           Prize: no prize (0 won)
+[#9]    Your numbers: 38 28 23 33 18 42
+[#9] Winning numbers:  7 40 21  5 29 30
+[#9]           Prize: no prize (0 won)
+[#10]    Your numbers:  2 17 41 36 34  5
+[#10] Winning numbers:  9 38 27 20 19 34
+[#10]           Prize: no prize (0 won)
+Press enter key to return the main menu.
+
+################################################################################
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                           < Lotto 6/45 simulator >                           #
+#                                                                              #
+#                 > 1. Single game mode (using keyboard input)                 #
+#                    2. Single game mode (using file input)                    #
+#                        3. Multi game simulation mode                         #
+#                                   4. About                                   #
+#                                   5. Quit                                    #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+#                                                                              #
+################################################################################
