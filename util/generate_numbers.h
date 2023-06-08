@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #ifndef GENERATE_NUMBERS_H
 #define GENERATE_NUMBERS_H
 

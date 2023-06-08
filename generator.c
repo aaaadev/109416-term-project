@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #include "util/generate_numbers.h"
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #ifndef SPLIT_WHITESPACE_H
 #define SPLIT_WHITESPACE_H
 

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #include "multi_game_result.h"
 #include "../console/console.h"
 #include "../console/menu.h"

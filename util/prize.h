@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #ifndef PRIZE_H
 #define PRIZE_H
 

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #include "split_whitespace.h"
 #include <stdlib.h>
 #include <string.h>

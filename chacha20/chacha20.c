@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 
 #include "chacha20.h"
+#include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdatomic.h>
 
 static atomic_uint_fast8_t dummy[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -70,14 +70,14 @@ uint64_t chacha20_random64() {
   const size_t size = 8;
   uint8_t key[KEY_LEN] = {};
   uint8_t nonce[NONCE_LEN] = {};
-  for (size_t i = 0; i < KEY_LEN-size; i++)
+  for (size_t i = 0; i < KEY_LEN - size; i++)
     key[i] = (uint8_t)(rand() % (1 << 8));
-  for (size_t i = KEY_LEN-size; i < KEY_LEN; i++)
-    key[i] = atomic_load(&dummy[i-(KEY_LEN-size)]);
-  for (size_t i = 0; i < NONCE_LEN-size; i++)
+  for (size_t i = KEY_LEN - size; i < KEY_LEN; i++)
+    key[i] = atomic_load(&dummy[i - (KEY_LEN - size)]);
+  for (size_t i = 0; i < NONCE_LEN - size; i++)
     nonce[i] = (uint8_t)(rand() % (1 << 8));
-  for (size_t i = NONCE_LEN-size; i < NONCE_LEN; i++)
-    nonce[i] = atomic_load(&dummy[i-(NONCE_LEN-size)]);
+  for (size_t i = NONCE_LEN - size; i < NONCE_LEN; i++)
+    nonce[i] = atomic_load(&dummy[i - (NONCE_LEN - size)]);
   uint8_t *buffer = chacha20_random(size, key, nonce);
   uint64_t res = 0;
   for (size_t i = 0; i < size; i++) {

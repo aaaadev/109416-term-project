@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #ifndef CHECK_DUPLICATE_H
 #define CHECK_DUPLICATE_H
 

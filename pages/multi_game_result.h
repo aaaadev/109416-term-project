@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #ifndef MULTI_GAME_RESULT_H
 #define MULTI_GAME_RESULT_H
 

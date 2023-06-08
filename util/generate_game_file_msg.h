@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 #ifndef GENERATE_GAME_FILE_MSG_H
 #define GENERATE_GAME_FILE_MSG_H
 
